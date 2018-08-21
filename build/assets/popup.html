@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="panel-section panel-section-header" id="header">
+      <div class="icon-section-header"><img id="icon" style="width: 48px; position: relative; right: 6px" src="large_success.png"/></div>
+      <div class="text-section-header">
+        <span class="header" id="header-origin">(Page is still loading...)</span><br />
+        <span class="sub-header" id="sub-header">Content validation is enabled.</span>
+      </div>
+    </header>
+    <div class="panel-section" id="error-addendum" style="display: none">
+      <p style="width: 400px"><span class="strong">Error:</span> <span id="error-msg"></span></p>
+    </div>
+    <div class="panel-section">
+      <p id="cache-notice" style="display:none">This page was served from your
+      browser's cache. Integrity information is not available.</p>
+      <table id="content-table" style="display: none">
+        <tr>
+          <td class="legend">Website&nbsp;ID:</td>
+          <td class="content" id="content-website"></td>
+        </tr>
+        <tr>
+          <td class="legend">Page&nbsp;ID:</td>
+          <td class="content" id="content-page"></td>
+        </tr>
+      </table>
+    </div>
+    <div class="panel-section-separator" id="gateway-separator" style="display: none"></div>
+    <div class="panel-section" id="gateway-addendum" style="display: none">
+      <p id="gateway-warning"><span class="strong">Do not enter personal information on
+      this page!</span> Credentials entered on this page may be stolen by any
+      other application served from this domain.</p>
+    </div>
+
+    <script type="text/javascript" src="popup.js"></script>
+  </body>
+</html>

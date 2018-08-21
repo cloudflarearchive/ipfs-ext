@@ -1,0 +1,36 @@
+body {
+  overflow: hidden;
+}
+
+header span.header {
+  font-weight: bolder;
+}
+header span.sub-header {
+  font-size: 13px;
+}
+
+table {
+  border: 0;
+  padding: 0.8rem;
+}
+table td.legend {
+  font-size: 13px;
+  text-align: right;
+}
+table td.content {
+  font-size: 13px;
+  font-family: monospace;
+  -moz-user-select: text;
+  user-select: text;
+  cursor: text;
+}
+
+p {
+  padding: 0 0.8rem;
+}
+p span.strong {
+  font-weight: bolder;
+}
+p#cache-notice {
+  width: 400px;
+}

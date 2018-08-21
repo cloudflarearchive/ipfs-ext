@@ -1,0 +1,28 @@
+{
+  "version": "1.2",
+  "icons": {
+    "96": "assets/icon.png"
+  },
+  "name": "IPFS Gateway Validator",
+  "description": "Validates IPFS resources served by Cloudflare's gateway.",
+
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "http://*/*",
+    "https://*/*"
+  ],
+
+  "background": {
+    "scripts": ["background.bundle.js"]
+  },
+  "page_action": {
+    "browser_style": true,
+    "default_icon": "assets/small_success.png",
+    "default_title": "Content validation enabled",
+    "default_popup": "assets/popup.html"
+  },
+
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
+  "manifest_version": 2
+}

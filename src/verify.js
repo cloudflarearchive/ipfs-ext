@@ -1,6 +1,7 @@
 const CID = require("cids")
 const dagPB = require("ipld-dag-pb")
 const ipns = require("ipns")
+const keys = require("libp2p-crypto").keys
 const multihash = require("multihashes")
 const PeerId = require("peer-id")
 const protons = require("protons")
@@ -100,30 +101,44 @@ class Path {
   }
 
   async stepIPNS(data) {
-    return new Promise((resolve, reject) => {
-      let peer = PeerId.createFromB58String(this.segments[2])
-      let parsed = ipns.unmarshal(data)
+    let peer = PeerId.createFromB58String(this.segments[2])
+    let parsed = ipns.unmarshal(data)
 
-      ipns.extractPublicKey(peer, parsed, (err, publicKey) => {
+    let publicKey = await this.ipnsPublicKey(peer, parsed)
+
+    return new Promise((resolve, reject) => {
+      ipns.validate(publicKey, parsed, (err) => {
         if (err != null) {
-          reject(new Error("error extracting ipns public key:" + err))
+          reject(err)
           return
         }
-        ipns.validate(publicKey, parsed, (err) => {
-          if (err != null) {
-            reject(err)
-            return
+        let temp = parsed.value.toString().replace(/\/+/gi, "/").replace(/\/$/, "").split("/")
+        if (temp.length >= 3 && temp[0] == "" && (temp[1] == "ipfs" || temp[1] == "ipns")) {
+          if (temp[1] == "ipfs") {
+            temp[2] = this.parse(temp[2])
           }
-          let temp = parsed.value.toString().replace(/\/+/gi, "/").replace(/\/$/, "").split("/")
-          if (temp.length >= 3 && temp[0] == "" && (temp[1] == "ipfs" || temp[1] == "ipns")) {
-            if (temp[1] == "ipfs") {
-              temp[2] = this.parse(temp[2])
-            }
-            this.segments = join(temp, this.segments.slice(3))
-          }
-          resolve()
-        })
+          this.segments = join(temp, this.segments.slice(3))
+        }
+        resolve()
       })
+    })
+  }
+
+  async ipnsPublicKey(peer, parsed) {
+    let raw = peer.toBytes()
+
+    // Check if the public key is just embedded in the peer ID.
+    if (raw.length > 1 && raw[0] == 0x00) {
+      return keys.unmarshalPublicKey(raw)
+    }
+
+    // Extract the public key from the IPNS record.
+    return crypto.subtle.digest("SHA-256", parsed.pubKey).then((digest) => {
+      let mh = multihash.encode(Buffer.from(digest), "sha2-256")
+      if (!raw.equals(mh)) {
+        throw new Error("given unexpected public key")
+      }
+      return keys.unmarshalPublicKey(parsed.pubKey)
     })
   }
 

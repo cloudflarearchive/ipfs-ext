@@ -103,6 +103,9 @@ function intercept(details) {
     filter.close()
   }
   processed.onerror = (err, msg) => {
+    if (err != null && err.srcElement != null && err.srcElement.error == "Channel redirected") {
+      return
+    }
     first = false
     if (firstErr) {
       pageAction.show(details, url, null, err)

@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Live Demo: timestamp-nano</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+  <link href="./demo.css" rel="stylesheet">
+  <!--[if lt IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://rawgit.com/kawanet/qs-lite/master/dist/qs-lite.min.js"></script>
+  <script src="https://rawgit.com/kawanet/int64-buffer/master/dist/int64-buffer.min.js"></script>
+  <script src="https://rawgit.com/kawanet/timestamp-nano/master/dist/timestamp.min.js"></script>
+  <!--
+  <script src="../../timestamp.js"></script>
+  <script src="../../dist/timestamp.min.js"></script>
+  -->
+  <script src="./demo.js"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="https://github.com/kawanet/timestamp-nano">timestamp-nano</a>
+    </div>
+    <div id="navbar" class="collapse navbar-collapse">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="./index.html">Live Demo</a></li>
+        <li><a href="../typedoc/classes/timestamp.html">Documentation</a></li>
+        <li><a href="https://github.com/kawanet/timestamp-nano">GitHub</a></li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div>
+</nav>
+
+<div class="container">
+  <form class="form-horizontal">
+    <div class="form-group">
+      <label for="format" class="col-sm-2 control-label">strftime</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" id="format" value="%Y-%m-%dT%H:%M:%S.%NZ" readonly>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="json" class="col-sm-2 control-label">String</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" id="json">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="time" class="col-sm-2 control-label">time_t</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" id="time">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="hex" class="col-sm-2 control-label">Int64BE</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" id="hex">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="nano" class="col-sm-2 control-label">Nanosec</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" id="nano">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="col-sm-2"></div>
+      <div class="col-sm-10">
+        <span class="btn btn-warning mod-btn" data-nano="-1000000000">
+          <i class="glyphicon glyphicon-chevron-left"></i>
+          -1s
+        </span>
+        <span class="btn btn-warning mod-btn" data-nano="-1000000">
+          <i class="glyphicon glyphicon-chevron-left"></i>
+          -1ms
+        </span>
+        <span class="btn btn-warning mod-btn" data-nano="-1">
+          <i class="glyphicon glyphicon-chevron-left"></i>
+          -1ns
+        </span>
+        <span class="btn btn-warning mod-btn" data-nano="1">
+          +1ns
+          <i class="glyphicon glyphicon-chevron-right"></i>
+        </span>
+        <span class="btn btn-warning mod-btn" data-nano="1000000">
+          +1ms
+          <i class="glyphicon glyphicon-chevron-right"></i>
+        </span>
+        <span class="btn btn-warning mod-btn" data-nano="1000000000">
+          +1s
+          <i class="glyphicon glyphicon-chevron-right"></i>
+        </span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-sm-2 control-label">Shortcut</label>
+      <div class="col-sm-10">
+        <a href="#!?" class="btn btn-primary">Current Time</a>
+        <a href="#!?time=0" class="btn btn-primary">UNIX Epoch</a>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="col-sm-2"></div>
+      <div class="col-sm-10">
+        <a href="#!?time=-8640000000000" class="btn btn-primary">-100,0000,000 day</a>
+        <a href="#!?time=8640000000000" class="btn btn-primary">+100,0000,000 day</a>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-sm-2 control-label">32 bit</label>
+      <div class="col-sm-10">
+        <a href="#!?hex=-80000000" class="btn btn-primary">-80000000</a>
+        <a href="#!?hex=7FFFFFFF" class="btn btn-primary">+7FFFFFFF</a>
+        <a href="#!?hex=FFFFFFFF" class="btn btn-primary">+FFFFFFFF</a>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-sm-2 control-label">64 bit</label>
+      <div class="col-sm-10">
+        <a href="#!?hex=-8000000000000000" class="btn btn-primary">-80000000 00000000</a>
+        <a href="#!?hex=7FFFFFFFFFFFFFFF" class="btn btn-primary">+7FFFFFFF FFFFFFFF</a>
+      </div>
+    </div>
+
+    <div class="form-group internal-property">
+      <label class="col-sm-2 control-label">Internal</label>
+      <div class="col-sm-3" title="year">
+        <input type="text" class="form-control" id="_year" readonly>
+      </div>
+      <div class="col-sm-4" title="time">
+        <input type="text" class="form-control" id="_time" readonly>
+      </div>
+      <div class="col-sm-3" title="nano">
+        <input type="text" class="form-control" id="_nano" readonly>
+      </div>
+    </div>
+
+  </form>
+
+  <footer class="footer">
+    <p>&copy; 2017 kawanet</p>
+  </footer>
+</div>
+</body>
+</html>

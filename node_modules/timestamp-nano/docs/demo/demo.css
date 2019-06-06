@@ -1,0 +1,29 @@
+@charset "utf-8";
+
+.navbar-brand {
+    font-weight: bolder;
+}
+
+.container form {
+    margin-top: 80px;
+    margin-bottom: 80px;
+}
+
+label {
+    font-size: 20px;
+}
+
+input.form-control {
+    font-size: 30px;
+    height: 50px;
+}
+
+a.btn, span.btn {
+    font-size: 20px;
+    height: 40px;
+    margin-bottom: 5px;
+}
+
+.internal-property input.form-control {
+    font-size: 20px;
+}

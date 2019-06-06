@@ -3,6 +3,7 @@ var fs = require('fs');
 var path = require('path');
 var caller = require('./caller.js');
 var nodeModulesPaths = require('./node-modules-paths.js');
+var normalizeOptions = require('./normalize-options.js');
 
 var defaultIsFile = function isFile(file, cb) {
     fs.stat(file, function (err, stat) {
@@ -14,10 +15,20 @@ var defaultIsFile = function isFile(file, cb) {
     });
 };
 
+var defaultIsDir = function isDirectory(dir, cb) {
+    fs.stat(dir, function (err, stat) {
+        if (!err) {
+            return cb(null, stat.isDirectory());
+        }
+        if (err.code === 'ENOENT' || err.code === 'ENOTDIR') return cb(null, false);
+        return cb(err);
+    });
+};
+
 module.exports = function resolve(x, options, callback) {
     var cb = callback;
-    var opts = options || {};
-    if (typeof opts === 'function') {
+    var opts = options;
+    if (typeof options === 'function') {
         cb = opts;
         opts = {};
     }
@@ -28,7 +39,10 @@ module.exports = function resolve(x, options, callback) {
         });
     }
 
+    opts = normalizeOptions(x, opts);
+
     var isFile = opts.isFile || defaultIsFile;
+    var isDirectory = opts.isDirectory || defaultIsDir;
     var readFile = opts.readFile || fs.readFile;
 
     var extensions = opts.extensions || ['.js'];
@@ -37,22 +51,37 @@ module.exports = function resolve(x, options, callback) {
 
     opts.paths = opts.paths || [];
 
-    if (/^(?:\.\.?(?:\/|$)|\/|([A-Za-z]:)?[/\\])/.test(x)) {
-        var res = path.resolve(basedir, x);
-        if (x === '..' || x.slice(-1) === '/') res += '/';
-        if (/\/$/.test(x) && res === basedir) {
-            loadAsDirectory(res, opts.package, onfile);
-        } else loadAsFile(res, opts.package, onfile);
-    } else loadNodeModules(x, basedir, function (err, n, pkg) {
-        if (err) cb(err);
-        else if (n) cb(null, n, pkg);
-        else if (core[x]) return cb(null, x);
-        else {
-            var moduleError = new Error("Cannot find module '" + x + "' from '" + parent + "'");
-            moduleError.code = 'MODULE_NOT_FOUND';
-            cb(moduleError);
-        }
-    });
+    // ensure that `basedir` is an absolute path at this point, resolving against the process' current working directory
+    var absoluteStart = path.resolve(basedir);
+
+    if (opts.preserveSymlinks === false) {
+        fs.realpath(absoluteStart, function (realPathErr, realStart) {
+            if (realPathErr && realPathErr.code !== 'ENOENT') cb(err);
+            else init(realPathErr ? absoluteStart : realStart);
+        });
+    } else {
+        init(absoluteStart);
+    }
+
+    var res;
+    function init(basedir) {
+        if ((/^(?:\.\.?(?:\/|$)|\/|([A-Za-z]:)?[/\\])/).test(x)) {
+            res = path.resolve(basedir, x);
+            if (x === '..' || x.slice(-1) === '/') res += '/';
+            if ((/\/$/).test(x) && res === basedir) {
+                loadAsDirectory(res, opts.package, onfile);
+            } else loadAsFile(res, opts.package, onfile);
+        } else loadNodeModules(x, basedir, function (err, n, pkg) {
+            if (err) cb(err);
+            else if (core[x]) return cb(null, x);
+            else if (n) cb(null, n, pkg);
+            else {
+                var moduleError = new Error("Cannot find module '" + x + "' from '" + parent + "'");
+                moduleError.code = 'MODULE_NOT_FOUND';
+                cb(moduleError);
+            }
+        });
+    }
 
     function onfile(err, m, pkg) {
         if (err) cb(err);
@@ -115,7 +144,7 @@ module.exports = function resolve(x, options, callback) {
         if (process.platform === 'win32' && (/^\w:[/\\]*$/).test(dir)) {
             return cb(null);
         }
-        if (/[/\\]node_modules[/\\]*$/.test(dir)) return cb(null);
+        if ((/[/\\]node_modules[/\\]*$/).test(dir)) return cb(null);
 
         var pkgfile = path.join(dir, 'package.json');
         isFile(pkgfile, function (err, ex) {
@@ -158,6 +187,11 @@ module.exports = function resolve(x, options, callback) {
                 }
 
                 if (pkg.main) {
+                    if (typeof pkg.main !== 'string') {
+                        var mainError = new TypeError('package “' + pkg.name + '” `main` must be a string');
+                        mainError.code = 'INVALID_PACKAGE_MAIN';
+                        return cb(mainError);
+                    }
                     if (pkg.main === '.' || pkg.main === './') {
                         pkg.main = 'index';
                     }
@@ -185,8 +219,14 @@ module.exports = function resolve(x, options, callback) {
         if (dirs.length === 0) return cb(null, undefined);
         var dir = dirs[0];
 
-        var file = path.join(dir, x);
-        loadAsFile(file, opts.package, onfile);
+        isDirectory(dir, isdir);
+
+        function isdir(err, isdir) {
+            if (err) return cb(err);
+            if (!isdir) return processDirs(cb, dirs.slice(1));
+            var file = path.join(dir, x);
+            loadAsFile(file, opts.package, onfile);
+        }
 
         function onfile(err, m, pkg) {
             if (err) return cb(err);
@@ -201,6 +241,6 @@ module.exports = function resolve(x, options, callback) {
         }
     }
     function loadNodeModules(x, start, cb) {
-        processDirs(cb, nodeModulesPaths(start, opts));
+        processDirs(cb, nodeModulesPaths(start, opts, x));
     }
 };

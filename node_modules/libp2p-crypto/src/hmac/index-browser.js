@@ -2,7 +2,7 @@
 
 const nodeify = require('../nodeify')
 
-const crypto = require('../webcrypto.js')()
+const crypto = require('../webcrypto')
 const lengths = require('./lengths')
 
 const hashTypes = {
@@ -12,7 +12,7 @@ const hashTypes = {
 }
 
 const sign = (key, data, cb) => {
-  nodeify(crypto.subtle.sign({name: 'HMAC'}, key, data)
+  nodeify(crypto.subtle.sign({ name: 'HMAC' }, key, data)
     .then((raw) => Buffer.from(raw)), cb)
 }
 
@@ -24,7 +24,7 @@ exports.create = function (hashType, secret, callback) {
     secret,
     {
       name: 'HMAC',
-      hash: {name: hash}
+      hash: { name: hash }
     },
     false,
     ['sign']

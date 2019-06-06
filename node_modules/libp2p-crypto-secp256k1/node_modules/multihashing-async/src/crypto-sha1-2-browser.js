@@ -18,7 +18,7 @@ function getWebCrypto () {
 
 function webCryptoHash (type) {
   if (!webCrypto) {
-    throw new Error('Please use a browser with webcrypto support')
+    throw new Error('Please use a browser with webcrypto support and ensure the code has been delivered securely via HTTPS/TLS and run within a Secure Context')
   }
 
   return (data, callback) => {

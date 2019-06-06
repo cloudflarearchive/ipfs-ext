@@ -1,0 +1,12 @@
+*.min.js.gz
+*~
+.DS_Store
+.Thumbs
+._*
+.idea
+.nyc_output
+docs/typedoc/classes/[^t]*
+docs/typedoc/interfaces
+docs/typedoc/modules
+node_modules
+npm-debug.log*

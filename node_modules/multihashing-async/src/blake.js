@@ -1,8 +1,7 @@
 'use strict'
 
+const { Buffer } = require('buffer')
 const blake = require('blakejs')
-
-const toCallback = require('./utils').toCallback
 
 const minB = 0xb201
 const minS = 0xb241
@@ -19,11 +18,14 @@ const blake2s = {
   digest: blake.blake2sFinal
 }
 
-const makeB2Hash = (size, hf) => toCallback((buf) => {
+// Note that although this function doesn't do any asynchronous work, we mark
+// the function as async because it must return a Promise to match the API
+// for other functions that do perform asynchronous work (see sha.browser.js)
+const makeB2Hash = (size, hf) => async (data) => {
   const ctx = hf.init(size, null)
-  hf.update(ctx, buf)
+  hf.update(ctx, data)
   return Buffer.from(hf.digest(ctx))
-})
+}
 
 module.exports = (table) => {
   for (let i = 0; i < 64; i++) {

@@ -1,0 +1,5 @@
+*~
+dist/*.min.js
+docs/typedoc
+node_modules
+test/80.typescript.js

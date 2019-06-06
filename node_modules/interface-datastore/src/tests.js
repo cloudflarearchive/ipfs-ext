@@ -111,6 +111,15 @@ module.exports = (test/* : Test */) => {
         })
       ], done)
     })
+
+    it('should return error with missing key', (done) => {
+      const k = new Key('/does/not/exist')
+      check(store).get(k, (err) => {
+        expect(err).to.exist()
+        expect(err).to.have.property('code', 'ERR_NOT_FOUND')
+        done()
+      })
+    })
   })
 
   describe('delete', () => {

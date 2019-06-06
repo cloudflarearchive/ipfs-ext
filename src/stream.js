@@ -205,22 +205,21 @@ function decodeFile(input) {
     if (evt.data[0] == 0) {
       cb({raw: evt.data.subarray(1), links: [], data: evt.data.subarray(1)})
     } else if (evt.data[0] == 1) {
-      dagPB.util.deserialize(evt.data.subarray(1), (err, node) => {
-        if (err != null) {
-          cb(null, err)
-          return
-        }
-        let file = Unixfs.unmarshal(node.data)
+      try {
+        let node = dagPB.util.deserialize(evt.data.subarray(1))
+
+        let file = Unixfs.unmarshal(node.Data)
         if (file.type != "raw" && file.type != "file") {
-          cb(null, new Error("got unexpected file type, wanted raw or file"))
-          return
+          throw new Error("got unexpected file type, wanted raw or file")
         }
         if (file.data == null) {
           file.data = Buffer.alloc(0)
         }
 
-        cb({raw: evt.data.subarray(1), links: node.links, data: file.data})
-      })
+        cb({raw: evt.data.subarray(1), links: node.Links, data: file.data})
+      } catch (err) {
+        cb(null, err)
+      }
     } else {
       cb(null, new Error("failed to decode a chunk of file data"))
     }

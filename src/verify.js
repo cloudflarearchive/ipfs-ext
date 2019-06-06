@@ -151,23 +151,16 @@ class Path {
       throw new Error("given unexpected data")
     }
 
-    return new Promise((resolve, reject) => {
-      dagPB.util.deserialize(data, (err, node) => {
-        if (err != null) {
-          reject(new Error("error parsing node:" + err))
-          return
-        }
-        let link = node.links.find((link) => link.name == this.segments[3])
-        if (link == null) {
-          reject(new Error("link with desired name not found"))
-          return
-        }
-        let mh = this.parse(link.multihash)
+    let node = dagPB.util.deserialize(data)
 
-        this.segments = join(["", "ipfs", mh], this.segments.slice(4))
-        resolve()
-      })
-    })
+    let link = node.Links.find((link) => link.Name == this.segments[3])
+    if (link == null) {
+      throw new Error("link with desired name not found")
+      return
+    }
+    mh = this.parse(link.Hash)
+
+    this.segments = join(["", "ipfs", mh], this.segments.slice(4))
   }
 
   async stepHAMT(data) {
@@ -183,47 +176,36 @@ class Path {
       throw new Error("given unexpected data")
     }
 
-    return new Promise((resolve, reject) => {
-      dagPB.util.deserialize(rest, (err, node) => {
-        if (err != null) {
-          reject(new Error("error parsing node:" + err))
-          return
-        }
-        let folder = unixfsData.decode(node.data)
-        if (folder.Type != unixfsData.DataType.HAMTShard) {
-          reject(new Error("got unexpected file type, wanted hamt sharded directory"))
-          return
-        }
-        let padlen = (folder.fanout-1).toString(16).length
+    let node = dagPB.util.deserialize(rest)
 
-        let link = node.links.find((link) => link.name == name)
-        if (link == null) {
-          reject(new Error("link with desired name not found"))
-          return
-        }
-        let mh = this.parse(link.multihash)
+    let folder = unixfsData.decode(node.Data)
+    if (folder.Type != unixfsData.DataType.HAMTShard) {
+      throw new Error("got unexpected file type, wanted hamt sharded directory")
+    }
+    let padlen = (folder.fanout-1).toString(16).length
 
-        // Check if we're at an intermediate node in the tree. If so, mindlessly
-        // step down to the child node we were told to.
-        if (link.name.length == padlen) {
-          this.segments[2] = mh
-          resolve()
-          return
-        }
+    let link = node.Links.find((link) => link.Name == name)
+    if (link == null) {
+      throw new Error("link with desired name not found")
+    }
+    mh = this.parse(link.Hash)
 
-        // We're at a leaf node. Verify that this is the next step in the path
-        // we've been waiting for, and if it is, then step down.
-        if (link.name.slice(padlen) == this.segments[3]) {
-          this.hamt = false
-          this.segments = join(["", "ipfs", mh], this.segments.slice(4))
-          resolve()
-          return
-        }
+    // Check if we're at an intermediate node in the tree. If so, mindlessly
+    // step down to the child node we were told to.
+    if (link.Name.length == padlen) {
+      this.segments[2] = mh
+      return
+    }
 
-        reject(new Error("search through sharded directory ended at unexpected node"))
-        return
-      })
-    })
+    // We're at a leaf node. Verify that this is the next step in the path
+    // we've been waiting for, and if it is, then step down.
+    if (link.Name.slice(padlen) == this.segments[3]) {
+      this.hamt = false
+      this.segments = join(["", "ipfs", mh], this.segments.slice(4))
+      return
+    }
+
+    throw new Error("search through sharded directory ended at unexpected node")
   }
 
   // done returns true if we've resolved the path to a base CID.
@@ -263,7 +245,7 @@ class TreeWalk {
     if (links == null) {
       links = []
     }
-    links = links.map((link) => (new CID(link.multihash)).multihash)
+    links = links.map((link) => (new CID(link.Hash)).multihash)
 
     let stepDone = this.stack.links.length == 0
     let subLinks = links.length > 0

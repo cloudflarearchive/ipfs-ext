@@ -2,6 +2,7 @@
 'use strict'
 
 const uuid = require('uuid/v4')
+const withIs = require('class-is')
 
 const pathSepS = '/'
 const pathSepB = Buffer.from(pathSepS)
@@ -83,7 +84,7 @@ class Key {
    *
    */
   static withNamespaces (list /* : Array<string> */) /* : Key */ {
-    return new Key(list.join(pathSepS))
+    return new _Key(list.join(pathSepS))
   }
 
   /**
@@ -97,7 +98,7 @@ class Key {
    *
    */
   static random () /* : Key */ {
-    return new Key(uuid().replace(/-/g, ''))
+    return new _Key(uuid().replace(/-/g, ''))
   }
 
   /**
@@ -236,7 +237,7 @@ class Key {
    * // => Key('/Comedy/MontyPython/Actor:JohnCleese')
    */
   instance (s /* : string */) /* : Key */ {
-    return new Key(this.toString() + ':' + s)
+    return new _Key(this.toString() + ':' + s)
   }
 
   /**
@@ -255,7 +256,7 @@ class Key {
       p += pathSepS
     }
     p += this.type()
-    return new Key(p)
+    return new _Key(p)
   }
 
   /**
@@ -271,10 +272,10 @@ class Key {
   parent () /* : Key */ {
     const list = this.list()
     if (list.length === 1) {
-      return new Key(pathSepS)
+      return new _Key(pathSepS)
     }
 
-    return new Key(list.slice(0, -1).join(pathSepS))
+    return new _Key(list.slice(0, -1).join(pathSepS))
   }
 
   /**
@@ -295,7 +296,7 @@ class Key {
       return this
     }
 
-    return new Key(this.toString() + key.toString(), false)
+    return new _Key(this.toString() + key.toString(), false)
   }
 
   /**
@@ -372,4 +373,6 @@ function namespaceValue (ns /* : string */) /* : string */ {
   return parts[parts.length - 1]
 }
 
-module.exports = Key
+const _Key = withIs(Key, { className: 'Key', symbolName: '@ipfs/interface-datastore/key' })
+
+module.exports = _Key

@@ -4,7 +4,7 @@ const util = require("./util.js")
 
 let blacklist = {}
 function isBlacklisted(url) {
-  if (!util.isGateway(url)) {
+  if (!util.isGateway(url) || util.isSubdomainGateway(url)) {
     return false
   }
   let parts = url.pathname.split("/")
@@ -114,7 +114,7 @@ function intercept(details) {
     console.log(err)
 
     if (msg != null && details.type == "main_frame") {
-      let isDNS = /^ipfs resolve -r \/ipns\/.+: dns resolution:/.test(msg.toString())
+      let isDNS = /^ipfs resolve -r \/ipns\/.+: could not resolve name/.test(msg.toString())
       if (isDNS && util.isGateway(url)) {
         // The page failed to load because of a DNS issue. (Probably DNSSEC is not
         // setup.) Add the page to the blacklist and refresh.

@@ -31,7 +31,9 @@ class Path {
     if (pathname.length == 0 || pathname[0] != "/") {
       pathname = "/" + pathname
     }
-    if (!util.isGateway(url)) {
+    if (util.isSubdomainGateway(url)) {
+      pathname = "/ipfs/" + util.subdomainHash(url) + pathname
+    } else if (!util.isGateway(url)) {
       pathname = "/ipns/" + url.hostname + pathname
     }
     let segments = pathname.replace(/\/+/gi, "/").replace(/\/$/, "").split("/")

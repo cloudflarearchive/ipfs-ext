@@ -1,8 +1,9 @@
 function isGateway(url) {
   return (
-    url.hostname == "localhost" ||
+    url.host == "localhost:8080" ||
     url.hostname == "cloudflare-ipfs.com" ||
-    url.hostname == "www.cloudflare-ipfs.com"
+    url.hostname == "www.cloudflare-ipfs.com" ||
+    url.hostname == "staging.cloudflare-ipfs.com"
   ) && (
     url.pathname.startsWith("/ipfs/") ||
     url.pathname.startsWith("/ipns/")

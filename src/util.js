@@ -18,6 +18,9 @@ function isSubdomainGateway(url) {
 exports.isSubdomainGateway = isSubdomainGateway
 
 function subdomainHash(url) {
+  if (url.hostname.endsWith(".ipfs.cf-ipfs.com")) {
+    return url.hostname.slice(0, -1 * ".ipfs.cf-ipfs.com".length)
+  }
   return url.hostname.slice(0, -1 * ".cf-ipfs.com".length)
 }
 exports.subdomainHash = subdomainHash

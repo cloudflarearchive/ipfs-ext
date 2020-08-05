@@ -1,13 +1,14 @@
 'use strict'
-const baseTable = require('./base-table')
-const varintBufferEncode = require('./util').varintBufferEncode
 
-// this creates a map for codecName -> codeVarintBuffer
+const baseTable = require('./base-table.json')
+const varintEncode = require('./util').varintEncode
 
+// map for codecName -> codeVarintBuffer
 const varintTable = {}
-module.exports = varintTable
 
-for (let encodingName in baseTable) {
-  let code = baseTable[encodingName]
-  varintTable[encodingName] = varintBufferEncode(code)
+for (const encodingName in baseTable) {
+  const code = baseTable[encodingName]
+  varintTable[encodingName] = varintEncode(code)
 }
+
+module.exports = Object.freeze(varintTable)

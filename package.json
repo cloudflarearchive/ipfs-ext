@@ -5,15 +5,15 @@
     "dev": "watchify src/background.js -d -t strictify -o build/background.bundle.js"
   },
   "dependencies": {
-    "cids": "^0.7.1",
-    "ipfs-unixfs": "^0.1.16",
-    "ipld-dag-pb": "^0.17.4",
-    "ipns": "^0.5.2",
-    "peer-id": "^0.12.2",
-    "protons": "^1.0.1"
+    "cids": "^0.7.5",
+    "ipfs-unixfs": "^2.0.1",
+    "ipld-dag-pb": "^0.19.0",
+    "ipns": "^0.7.3",
+    "peer-id": "^0.13.13",
+    "protons": "^1.2.1"
   },
   "devDependencies": {
-    "browserify": "^16.2.3",
+    "browserify": "^16.5.1",
     "strictify": "^0.2.0"
   }
 }

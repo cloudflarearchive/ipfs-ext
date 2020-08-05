@@ -1,19 +1,26 @@
 URSA - RSA public/private key OpenSSL bindings for Node.js
 ====
 
-
-[![Build Status](https://travis-ci.org/JoshKaufman/ursa.svg?branch=master)](https://travis-ci.org/JoshKaufman/ursa)
-
-> NOTE: This package was transfered from [Medium](https://github.com/Medium) and [NodePrime](https://github.com/NodePrime) to [quartzjer](https://github.com/quartzjer) to [JoshKaufman](https://github.com/joshkaufman) on 8-2017. Pull requests are welcomed to help maintain it.
-
 --
 
 This Node module provides a fairly complete set of wrappers for the
 RSA public/private key crypto functionality of OpenSSL.
 
-It is being actively developed for node.js 0.8.* through 0.12.* and io.js. If you find it doesn't work for you, please file a bug (see below).
+It is being passivly fixed for nodeJS 8, 10 and 12 (always the current LTS versions). If you find it doesn't work for you, please file a bug (see below).
+Most likely you'll find a suting PR [here](https://github.com/JoshKaufman/ursa/pulls?q=is%3Apr+is%3Aopen+sort%3Aupdated-desc). Just drop it in your issue, and I'll cherry-pick the changes into a new release.
 
-It has been tested on Windows by [SLaks](https://github.com/SLaks).  (see [additional installation requirements](#windows-install))
+If this package does not work on Windows, then see the [additional installation requirements](#windows-install)
+
+NOTE: This package will never fail to install, but might throw an error if the compiled dependency is missing on runtime. This is a feature, not a bug, to allow the usage of a pureJS fallback library, such as [node-forge](https://npm.im/node-forge)
+
+History
+-------
+
+This package was transfered from [Medium](https://github.com/Medium) and [NodePrime](https://github.com/NodePrime) to [quartzjer](https://github.com/quartzjer) to [JoshKaufman](https://github.com/joshkaufman) on 8-2017
+
+After that, in 2018 this package was forked to a new package named `ursa-optional` by [mkg20001](https://github.com/mkg20001), with the added benefit of now being optional, to allow the usage of a fallback pureJS library
+
+Pull requests are welcomed to help maintain it
 
 Table of Contents
 -----------------

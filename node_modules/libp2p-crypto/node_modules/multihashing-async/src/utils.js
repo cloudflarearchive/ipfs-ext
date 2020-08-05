@@ -1,31 +1,8 @@
 'use strict'
 
-exports.toCallback = (doWork) => {
-  return function (input, callback) {
-    let res
-    try {
-      res = doWork(input)
-    } catch (err) {
-      process.nextTick(callback, err)
-      return
-    }
+const { Buffer } = require('buffer')
 
-    process.nextTick(callback, null, res)
-  }
-}
-
-exports.toBuf = (doWork, other) => (input) => {
-  let result = doWork(input, other)
-  return Buffer.from(result, 'hex')
-}
-
-exports.fromString = (doWork, other) => (_input) => {
-  const input = Buffer.isBuffer(_input) ? _input.toString() : _input
-  return doWork(input, other)
-}
-
-exports.fromNumberTo32BitBuf = (doWork, other) => (input) => {
-  let number = doWork(input, other)
+const fromNumberTo32BitBuf = (number) => {
   const bytes = new Array(4)
 
   for (let i = 0; i < 4; i++) {
@@ -34,4 +11,8 @@ exports.fromNumberTo32BitBuf = (doWork, other) => (input) => {
   }
 
   return Buffer.from(bytes)
+}
+
+module.exports = {
+  fromNumberTo32BitBuf
 }

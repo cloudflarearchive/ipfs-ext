@@ -1,6 +1,7 @@
 'use strict';
 
-const crypto = global.crypto || global.msCrypto;
+const crypto = self.crypto || self.msCrypto;
+const { Buffer } = require('buffer');
 
 // limit of Crypto.getRandomValues()
 // https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues
@@ -25,11 +26,12 @@ function randomBytes(size) {
     if (size > 0) {
         // getRandomValues fails on IE if size == 0
         if (size > MAX_BYTES) {
-            while (generated < bytes) {
-                if (generated + MAX_BYTES > bytes) {
+            while (generated < size) {
+                if (generated + MAX_BYTES > size) {
                     crypto.getRandomValues(
-                        bytes.subarray(generated, bytes - generated)
+                        bytes.subarray(generated, generated + (size - generated))
                     );
+                    generated += size - generated;
                 } else {
                     crypto.getRandomValues(
                         bytes.subarray(generated, generated + MAX_BYTES)

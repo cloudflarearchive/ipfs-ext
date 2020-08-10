@@ -21,3 +21,8 @@ module.exports.notFoundError = (err) => {
   err = err || new Error('Not Found')
   return errcode(err, 'ERR_NOT_FOUND')
 }
+
+module.exports.abortedError = (err) => {
+  err = err || new Error('Aborted')
+  return errcode(err, 'ERR_ABORTED')
+}

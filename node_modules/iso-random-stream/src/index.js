@@ -1,6 +1,6 @@
 'use strict';
 
-const { Readable } = require('stream');
+const { Readable } = require('readable-stream');
 const randomBytes = require('./random');
 
 module.exports = (size = Infinity) => {
